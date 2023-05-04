@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/bs.iml" filepath="$PROJECT_DIR$/bs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bs-admin/bs-admin.iml" filepath="$PROJECT_DIR$/bs-admin/bs-admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bs-business/bs-business.iml" filepath="$PROJECT_DIR$/bs-business/bs-business.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bs-common/bs-common.iml" filepath="$PROJECT_DIR$/bs-common/bs-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bs-framework/bs-framework.iml" filepath="$PROJECT_DIR$/bs-framework/bs-framework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bs-generator/bs-generator.iml" filepath="$PROJECT_DIR$/bs-generator/bs-generator.iml" />
+    </modules>
+  </component>
+</project>

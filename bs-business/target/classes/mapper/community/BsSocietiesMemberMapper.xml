@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.community.mapper.BsSocietiesMemberMapper">
+    
+    <resultMap type="BsSocietiesMember" id="BsSocietiesMemberResult">
+        <result property="id"    column="id"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="memberAvatar"    column="member_avatar"    />
+        <result property="memberName"    column="member_name"    />
+        <result property="memberPhone"    column="member_phone"    />
+        <result property="societiesId"    column="societies_id"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="societies"    column="societiesId" javaType="BsSocieties" resultMap="BsSocietiesResult" />
+    </resultMap>
+
+    <resultMap type="BsSocieties" id="BsSocietiesResult">
+        <result property="societiesId"    column="societies_id"    />
+        <result property="presidentId"    column="president_id"    />
+        <result property="societiesName"    column="societies_name"    />
+        <result property="societiesType"    column="societies_type"    />
+        <result property="societiesImg"    column="societies_img"    />
+        <result property="members"    column="members"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectBsSocietiesMemberVo">
+        select m.id, m.member_id, m.member_avatar, m.member_name, m.member_phone, m.societies_id, m.status, m.del_flag, m.create_time, m.update_time,
+        s.societies_name, s.societies_type, s.societies_img,s.members
+        from bs_societies_member m
+        left join bs_societies s on s.societies_id=m.societies_id
+    </sql>
+
+    <select id="selectBsSocietiesMemberList" parameterType="BsSocietiesMember" resultMap="BsSocietiesMemberResult">
+        <include refid="selectBsSocietiesMemberVo"/>
+        <where>  
+            <if test="memberName != null  and memberName != ''"> and m.member_name like concat('%', #{memberName}, '%')</if>
+            <if test="memberPhone != null  and memberPhone != ''"> and m.member_phone = #{memberPhone}</if>
+            <if test="societiesId != null "> and m.societies_id = #{societiesId}</if>
+            <if test="societies !=null and societies.societiesName != null  and societies.societiesName != ''"> and s.societies_name like concat('%', #{societies.societiesName}, '%')</if>
+            <if test="memberId != null "> and m.member_id = #{memberId}</if>
+            <if test="status != null  and status != ''"> and m.status = #{status}</if>
+        </where>
+        order by m.create_time desc
+    </select>
+    
+    <select id="selectBsSocietiesMemberById" parameterType="Long" resultMap="BsSocietiesMemberResult">
+        <include refid="selectBsSocietiesMemberVo"/>
+        where m.id = #{id}
+    </select>
+        
+    <insert id="insertBsSocietiesMember" parameterType="BsSocietiesMember" useGeneratedKeys="true" keyProperty="id">
+        insert into bs_societies_member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="memberAvatar != null">member_avatar,</if>
+            <if test="memberName != null and memberName != ''">member_name,</if>
+            <if test="memberPhone != null and memberPhone != ''">member_phone,</if>
+            <if test="societiesId != null">societies_id,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="memberAvatar != null">#{memberAvatar},</if>
+            <if test="memberName != null and memberName != ''">#{memberName},</if>
+            <if test="memberPhone != null and memberPhone != ''">#{memberPhone},</if>
+            <if test="societiesId != null">#{societiesId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBsSocietiesMember" parameterType="BsSocietiesMember">
+        update bs_societies_member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="memberAvatar != null">member_avatar = #{memberAvatar},</if>
+            <if test="memberName != null and memberName != ''">member_name = #{memberName},</if>
+            <if test="memberPhone != null and memberPhone != ''">member_phone = #{memberPhone},</if>
+            <if test="societiesId != null">societies_id = #{societiesId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBsSocietiesMemberById" parameterType="Long">
+        delete from bs_societies_member where id = #{id}
+    </delete>
+
+    <delete id="deleteBsSocietiesMemberByIds" parameterType="String">
+        delete from bs_societies_member where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

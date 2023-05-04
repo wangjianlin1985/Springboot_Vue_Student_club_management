@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.community.mapper.BsActivityLikeMapper">
+    
+    <resultMap type="BsActivityLike" id="BsActivityLikeResult">
+        <result property="likeId"    column="like_id"    />
+        <result property="likerId"    column="liker_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectBsActivityLikeVo">
+        select like_id, liker_id, create_time from bs_activity_like
+    </sql>
+
+    <select id="selectBsActivityLikeList" parameterType="BsActivityLike" resultMap="BsActivityLikeResult">
+        <include refid="selectBsActivityLikeVo"/>
+        <where>  
+            <if test="likerId != null "> and liker_id = #{likerId}</if>
+        </where>
+    </select>
+    
+    <select id="selectBsActivityLikeById" parameterType="Long" resultMap="BsActivityLikeResult">
+        <include refid="selectBsActivityLikeVo"/>
+        where like_id = #{likeId}
+    </select>
+        
+    <insert id="insertBsActivityLike" parameterType="BsActivityLike" useGeneratedKeys="true" keyProperty="likeId">
+        insert into bs_activity_like
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="likerId != null">liker_id,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="likerId != null">#{likerId},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBsActivityLike" parameterType="BsActivityLike">
+        update bs_activity_like
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="likerId != null">liker_id = #{likerId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where like_id = #{likeId}
+    </update>
+
+    <delete id="deleteBsActivityLikeById" parameterType="Long">
+        delete from bs_activity_like where like_id = #{likeId}
+    </delete>
+
+    <delete id="deleteBsActivityLikeByIds" parameterType="String">
+        delete from bs_activity_like where like_id in 
+        <foreach item="likeId" collection="array" open="(" separator="," close=")">
+            #{likeId}
+        </foreach>
+    </delete>
+</mapper>

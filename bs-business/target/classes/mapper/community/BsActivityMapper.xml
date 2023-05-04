@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.community.mapper.BsActivityMapper">
+    
+    <resultMap type="BsActivity" id="BsActivityResult">
+        <result property="activityId"    column="activity_id"    />
+        <result property="activityImg"    column="activity_img"    />
+        <result property="activityName"    column="activity_name"    />
+        <result property="introduction"    column="introduction"    />
+        <result property="activityContent"    column="activity_content"    />
+        <result property="societiesId"    column="societies_id"    />
+        <result property="societiesName"    column="societies_name"    />
+        <result property="address"    column="address"    />
+        <result property="status"    column="status"    />
+        <result property="openTime"    column="open_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectBsActivityVo">
+        select activity_id, activity_img, activity_name, introduction, activity_content, societies_id, societies_name, address, status, open_time, create_time, update_time from bs_activity
+    </sql>
+
+    <select id="selectBsActivityList" parameterType="BsActivity" resultMap="BsActivityResult">
+        <include refid="selectBsActivityVo"/>
+        <where>  
+            <if test="activityName != null  and activityName != ''"> and activity_name like concat('%', #{activityName}, '%')</if>
+            <if test="societiesId != null "> and societies_id = #{societiesId}</if>
+        	<if test="status != null "> and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectBsActivityById" parameterType="Long" resultMap="BsActivityResult">
+        <include refid="selectBsActivityVo"/>
+        where activity_id = #{activityId}
+    </select>
+        
+    <insert id="insertBsActivity" parameterType="BsActivity" useGeneratedKeys="true" keyProperty="activityId">
+        insert into bs_activity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="activityImg != null">activity_img,</if>
+            <if test="activityName != null and activityName != ''">activity_name,</if>
+            <if test="introduction != null and introduction != ''">introduction,</if>
+            <if test="activityContent != null and activityContent != ''">activity_content,</if>
+            <if test="societiesId != null">societies_id,</if>
+            <if test="societiesName != null and societiesName != ''">societies_name,</if>
+            <if test="address != null">address,</if>
+            <if test="status != null">status,</if>
+            <if test="openTime != null">open_time,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="activityImg != null">#{activityImg},</if>
+            <if test="activityName != null and activityName != ''">#{activityName},</if>
+            <if test="introduction != null and introduction != ''">#{introduction},</if>
+            <if test="activityContent != null and activityContent != ''">#{activityContent},</if>
+            <if test="societiesId != null">#{societiesId},</if>
+            <if test="societiesName != null and societiesName != ''">#{societiesName},</if>
+            <if test="address != null">#{address},</if>
+            <if test="status != null">#{status},</if>
+            <if test="openTime != null">#{openTime},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBsActivity" parameterType="BsActivity">
+        update bs_activity
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="activityImg != null">activity_img = #{activityImg},</if>
+            <if test="activityName != null and activityName != ''">activity_name = #{activityName},</if>
+            <if test="introduction != null and introduction != ''">introduction = #{introduction},</if>
+            <if test="activityContent != null and activityContent != ''">activity_content = #{activityContent},</if>
+            <if test="societiesId != null">societies_id = #{societiesId},</if>
+            <if test="societiesName != null and societiesName != ''">societies_name = #{societiesName},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="openTime != null">open_time = #{openTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where activity_id = #{activityId}
+    </update>
+
+    <delete id="deleteBsActivityById" parameterType="Long">
+        delete from bs_activity where activity_id = #{activityId}
+    </delete>
+
+    <delete id="deleteBsActivityByIds" parameterType="String">
+        delete from bs_activity where activity_id in 
+        <foreach item="activityId" collection="array" open="(" separator="," close=")">
+            #{activityId}
+        </foreach>
+    </delete>
+</mapper>

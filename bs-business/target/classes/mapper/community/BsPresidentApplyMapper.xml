@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.community.mapper.BsPresidentApplyMapper">
+    
+    <resultMap type="BsPresidentApply" id="BsPresidentApplyResult">
+        <result property="applyId"    column="apply_id"    />
+        <result property="presidentId"    column="president_id"    />
+        <result property="societiesId"    column="societies_id"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="president"    column="president_id" javaType="SysUser" resultMap="SysUserResult" />
+        <association property="societies"    column="societiesId" javaType="BsSocieties" resultMap="BsSocietiesResult" />
+    </resultMap>
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="avatar"       column="avatar"       />
+        <result property="userName"     column="user_name"    />
+        <result property="nickName"     column="nick_name"    />
+        <result property="idNumber"     column="id_number"    />
+    </resultMap>
+
+    <resultMap type="BsSocieties" id="BsSocietiesResult">
+        <result property="societiesId"    column="societies_id"    />
+        <result property="presidentId"    column="president_id"    />
+        <result property="societiesName"    column="societies_name"    />
+        <result property="societiesType"    column="societies_type"    />
+        <result property="societiesImg"    column="societies_img"    />
+        <result property="members"    column="members"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectBsPresidentApplyVo">
+        select p.apply_id, p.president_id, p.societies_id, p.status, p.create_time, p.update_time,
+        s.societies_name, s.societies_type, s.societies_img,
+        u.user_name, u.nick_name, u.email, u.avatar, u.phonenumber
+        from bs_president_apply p
+        left join sys_user u on u.user_id=p.president_id
+        left join bs_societies s on s.societies_id=p.societies_id
+    </sql>
+
+    <select id="selectBsPresidentApplyList" parameterType="BsPresidentApply" resultMap="BsPresidentApplyResult">
+        <include refid="selectBsPresidentApplyVo"/>
+        <where>  
+            <if test="presidentId != null "> and p.president_id = #{presidentId}</if>
+            <if test="societiesId != null "> and p.societies_id = #{societiesId}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="president!=null and president.nickName != null and president.nickName != ''">
+                AND u.nick_name like concat('%', #{president.nickName}, '%')
+            </if>
+            <if test="societies !=null and societies.societiesName != null  and societies.societiesName != ''"> and s.societies_name like concat('%', #{societies.societiesName}, '%')</if>
+        </where>
+        order by p.create_time desc
+    </select>
+    
+    <select id="selectBsPresidentApplyById" parameterType="Long" resultMap="BsPresidentApplyResult">
+        <include refid="selectBsPresidentApplyVo"/>
+        where p.apply_id = #{applyId}
+    </select>
+        
+    <insert id="insertBsPresidentApply" parameterType="BsPresidentApply" useGeneratedKeys="true" keyProperty="applyId">
+        insert into bs_president_apply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="presidentId != null">president_id,</if>
+            <if test="societiesId != null">societies_id,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="presidentId != null">#{presidentId},</if>
+            <if test="societiesId != null">#{societiesId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBsPresidentApply" parameterType="BsPresidentApply">
+        update bs_president_apply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="presidentId != null">president_id = #{presidentId},</if>
+            <if test="societiesId != null">societies_id = #{societiesId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where apply_id = #{applyId}
+    </update>
+
+    <delete id="deleteBsPresidentApplyById" parameterType="Long">
+        delete from bs_president_apply where apply_id = #{applyId}
+    </delete>
+
+    <delete id="deleteBsPresidentApplyByIds" parameterType="String">
+        delete from bs_president_apply where apply_id in 
+        <foreach item="applyId" collection="array" open="(" separator="," close=")">
+            #{applyId}
+        </foreach>
+    </delete>
+</mapper>

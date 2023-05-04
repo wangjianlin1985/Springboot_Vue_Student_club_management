@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.community.mapper.BsSocietiesCommentMapper">
+    
+    <resultMap type="BsSocietiesComment" id="BsSocietiesCommentResult">
+        <result property="id"    column="id"    />
+        <result property="replyId"    column="reply_id"    />
+        <result property="societiesId"    column="societies_id"    />
+        <result property="commentId"    column="comment_id"    />
+        <result property="targetId"    column="target_id"    />
+        <result property="content"    column="content"    />
+        <result property="createdate"    column="createDate"    />
+        <association property="commentUser"    column="comment_id" javaType="CommentUser" resultMap="CommentUserResult" />
+        <association property="targetUser"    column="target_id" javaType="TargetUser" resultMap="TargetUserResult" />
+        <association property="societies"    column="societiesId" javaType="BsSocieties" resultMap="BsSocietiesResult" />
+
+    </resultMap>
+
+    <resultMap type="CommentUser" id="CommentUserResult">
+        <id     property="id"       column="user_id"      />
+        <result property="avatar"       column="avatar"       />
+        <result property="nickName"     column="nick_name"    />
+    </resultMap>
+
+    <resultMap type="TargetUser" id="TargetUserResult">
+        <id     property="id"       column="user_id"      />
+        <result property="avatar"       column="avatar"       />
+        <result property="nickName"     column="nick_name"    />
+    </resultMap>
+
+    <resultMap type="BsSocieties" id="BsSocietiesResult">
+        <result property="societiesId"    column="societies_id"    />
+        <result property="presidentId"    column="president_id"    />
+        <result property="societiesName"    column="societies_name"    />
+        <result property="societiesType"    column="societies_type"    />
+        <result property="societiesImg"    column="societies_img"    />
+        <result property="members"    column="members"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectBsSocietiesCommentVo">
+        select c.id, c.reply_id, c.societies_id, c.comment_id, c.target_id, c.content, c.createDate ,
+        s.societies_name, s.societies_type, s.societies_img,
+        u1.user_id, u1.nick_name, u1.avatar,
+        u2.user_id, u2.nick_name, u2.avatar
+        from bs_societies_comment c
+        left join sys_user u1 on u1.user_id=c.comment_id
+        left join sys_user u2 on u2.user_id=c.comment_id
+        left join bs_societies s on s.societies_id=c.societies_id
+    </sql>
+
+    <select id="selectBsSocietiesCommentList" parameterType="BsSocietiesComment" resultMap="BsSocietiesCommentResult">
+        <include refid="selectBsSocietiesCommentVo"/>
+        <where>  
+            <if test="societiesId != null "> and c.societies_id = #{societiesId}</if>
+            <if test="replyId != null "> and c.reply_id = #{replyId}</if>
+            <if test="commentId != null "> and c.comment_id = #{commentId}</if>
+            <if test="targetId != null "> and c.target_id = #{targetId}</if>
+            <if test="societiesName != null  and societiesName != ''"> and s.societies_name like concat('%', #{societiesName}, '%')</if>
+        </where>
+        order by c.createDate desc
+    </select>
+    
+    <select id="selectBsSocietiesCommentById" parameterType="Long" resultMap="BsSocietiesCommentResult">
+        <include refid="selectBsSocietiesCommentVo"/>
+        where c.id = #{id}
+    </select>
+        
+    <insert id="insertBsSocietiesComment" parameterType="BsSocietiesComment" useGeneratedKeys="true" keyProperty="id">
+        insert into bs_societies_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="replyId != null">reply_id,</if>
+            <if test="societiesId != null">societies_id,</if>
+            <if test="commentId != null">comment_id,</if>
+            <if test="targetId != null">target_id,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="createdate != null">createDate,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="replyId != null">#{replyId},</if>
+            <if test="societiesId != null">#{societiesId},</if>
+            <if test="commentId != null">#{commentId},</if>
+            <if test="targetId != null">#{targetId},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="createdate != null">#{createdate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBsSocietiesComment" parameterType="BsSocietiesComment">
+        update bs_societies_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="replyId != null">reply_id = #{replyId},</if>
+            <if test="societiesId != null">societies_id = #{societiesId},</if>
+            <if test="commentId != null">comment_id = #{commentId},</if>
+            <if test="targetId != null">target_id = #{targetId},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="createdate != null">createDate = #{createdate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBsSocietiesCommentById" parameterType="Long">
+        delete from bs_societies_comment where id = #{id}
+    </delete>
+
+    <delete id="deleteBsSocietiesCommentByIds" parameterType="String">
+        delete from bs_societies_comment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
